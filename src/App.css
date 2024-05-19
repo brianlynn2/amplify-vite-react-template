@@ -40,3 +40,499 @@
 .read-the-docs {
   color: #888;
 }
+
+.App {
+  text-align: left;
+  position:relative;
+  overflow: hidden;
+  height : 100vh;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.Bubble {
+    clip-path: circle(35%);
+/*    border: 1px solid green; */
+    margin-right: 0px;
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.myborder {
+    border: 1px solid red;
+    padding-right: 0px;
+    margin-right: 0px;
+
+}
+
+.floating {
+    position: absolute;
+}
+
+.content {
+    position: relative;
+    height: 99vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.doc-content {
+max-width:800pt!important;
+border: 1px solid green;
+    padding-top: 0px!important;
+    padding-bottom: 12px!important;
+    margin-bottom : 12px;
+}
+
+.Scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 95%;
+}
+
+.centerBody {
+    width : 80%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1300px;
+}
+
+.mainMenu {
+    background : #3f3f3f;
+    background: #700000;
+    width: 100%;
+    height : 30px;
+    padding-left: 15%;
+    padding-top: 10px;
+
+}
+
+.banner {
+}
+
+.tile {
+    position: relative;
+    display: inline-block;
+    vertical-align : top;
+    border : 2px solid white;
+    background : #a0a0a0;
+    width: 32.5%;    max-height : 200px;
+    min-height : 200px;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+.shrunk {
+    max-height: 50px !important;
+    min-height:25px !important;
+}
+
+
+
+.tile:hover {
+    background : white;
+    border : 1px solid red;
+}
+
+
+
+.sectionShrunk {
+    display: block;
+    width: 99%;
+    vertical-align : top;
+    border : 1 px solid blue;
+
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+        margin-left: auto;
+        margin-right: auto;
+}
+.sectionFull {
+    display: block;
+    width: 99%;
+    vertical-align : top;
+
+    padding-left: 0px;
+    padding-right: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+.sectionTitleBand{
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+    fontSize: 16px;
+    color: white;
+   vertical-align: top;
+   background : grey;
+       cursor: pointer;
+}
+
+.tile:hover  .sectionTitleBand {
+    background : lightGrey;
+    color : red;
+}
+
+
+.sectionShrunk:hover  .sectionTitleBand {
+    background : lightGrey;
+    color : red;
+}
+.sectionTitleBand:hover   {
+    background : lightGrey;
+    color : red;
+}
+
+
+.sectionTitle {
+    margin-left: 10px;
+}
+
+.tileImage {
+    width: 100%;
+    overflow: hidden;
+}
+
+.tileImageWrapper {
+    overflow: hidden;
+    width : 100%;
+
+}
+
+.tileImageWrapper:hover {
+ /* transform: scale(1.1);*/
+}
+
+.sectionSummary:hover ~.tileImage.tileImageWrapper {
+/*  transform: scale(1.1);*/
+}
+
+.tile:hover .tileImageWrapper {
+  transform: scale(1.1);
+}
+.sectionContent {
+    width: 80%;
+    margin: auto;
+}
+
+.sectionImage {
+    text-align: center;
+
+}
+
+.sectionImageWrapper {
+    max-height: 50vh;
+    max-width: 100%;
+    overflow: hidden;
+    margin: auto;
+    padding: auto;
+
+}
+
+.sectionSummary {
+    text-overflow: ellipsis;
+    overflow : hidden;
+    color: white;
+    background : black;
+    opacity : 0.6;
+    max-height : 100 px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+
+.footer {
+    background : #3f3f3f;
+    width: 100%;
+    height : 30px;
+    padding-left: 10%;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    margin-bottom:3px;
+    margin-top: 3px;
+    margin-right: 0px;
+    padding-right: 0px;
+}
+
+.footerText {
+    color: white;
+    padding-right: 0%;
+}
+
+.footerLeft {
+    max-width: 60%;
+    min-width: 60%;
+    display: inline-block;
+}
+
+.contact {
+    color: white;
+        padding-left: 0%;
+        padding-right: 10%;
+}
+
+.copyright {
+    color: white;
+        padding-left: 10%;
+        padding-right: 10%;
+        white-space: nowrap;
+}
+
+
+.socials {
+    color: white;
+        padding-left: 10%;
+        padding-right: 10%;
+    white-space: nowrap;
+}
+
+.socialSpace {
+    padding-right: 10px;
+}
+
+
+.menuEntry {
+    color : white;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right : 40px;
+    margin-top: 5px;
+}
+
+.menuEntrySelected{
+    color : white;
+    font-weight: bold;
+    background-color: teal;
+    text-decoration : underline;
+    margin-left: 10px;
+    margin-right : 40px;
+    margin-top: 5px;
+}
+
+.menuEntry:hover {
+    color : red;
+    text-decoration : underline;
+}
+
+.menuEntrySelected:hover {
+    color : red;
+    text-decoration : underline;
+}
+
+.vimeoFrame {
+    width: 640px;
+    height: 320px;
+}
+
+
+.categorySelector {
+    border: 1px solid black;
+}
+
+.categorySelectorLabel {
+    font-weight: bold;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 5px;
+    background: #669999;
+}
+
+.categoryButton {
+    display: inline-block;
+    margin-right: 20px;
+}
+.categoryButton:hover {
+    color: red
+}
+
+
+@media (max-width: 1400px) {
+.sectionContent {
+    width: 90%;
+}
+}
+
+@media (max-width: 1200px) {
+.tile {
+    width : 48%;
+}
+
+.footer {
+    padding-bottom: 15px;
+}
+
+.footerLeft {
+    min-width: 50%;
+}
+.sectionContent {
+    width: 95%;
+}
+
+.doc-content {
+    padding:24pt 24pt 24pt 24pt !important;
+}
+
+}
+
+@media (max-width: 1000px) {
+.vimeoFrame {
+    width: 500px;
+    height: 250px;
+}
+
+.doc-content {
+    padding:12pt 12pt 12pt 12pt !important;
+}
+
+
+}
+
+@media (max-width: 720px) {
+
+.menuEntry {
+    margin-right : 10px;
+}
+.menuEntrySelected{
+    margin-right : 10px;
+}
+
+
+.centerBody {
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.writeup {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.tile {
+    width : 98%;
+    min-height: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+
+
+.footerLeft {
+    padding-bottom: 20px;
+    min-width: 40%;
+}
+
+.footer {
+    padding-left: 5%;
+
+}
+
+.socials {
+    padding-left: 10%;
+}
+
+.socialSpace {
+    padding-right: 3px;
+}
+
+.sectionContent {
+    width: 98%;
+    margin: auto;
+}
+
+.vimeoFrame {
+    width: 480px;
+    height: 240px;
+}
+
+
+}
+
+@media (max-width: 500px) {
+
+
+.footer {
+    padding-bottom: 50px;
+    min-height: 50px;
+    width: 95%;
+
+}
+
+
+.footerLeft {
+    max-width: 40%;
+}
+
+.contact {
+}
+.copyright {
+    display: block;
+    padding-left: 0px;
+    padding-bottom: 20px;
+}
+
+.socials {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.vimeoFrame {
+    width: 320px;
+    height: 160px;
+}
+
+
+
+}
+
