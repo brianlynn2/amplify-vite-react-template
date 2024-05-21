@@ -60,10 +60,6 @@ function App() {
       );
     }
 
-  function AuthTest () {
-    return (<h1>Hello</h1>);
-  }
-
 
   function renderBrianSite() {
 
@@ -97,7 +93,7 @@ function routeSite() {
 }
 
 
-function createRoute (path , sel , nav, searchParams) {
+function createRoute (path :string, sel: string , nav: Function, searchParams: URLSearchParams) {
 
    var elem = <BrianSite sel={sel} hist={history} nav={nav} searchParams={searchParams} />;
     return (
