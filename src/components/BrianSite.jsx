@@ -3,6 +3,7 @@ import '../App.css';
 import { Link } from "react-router-dom";
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
+//import '../assets/slideshow.css';
 import Portfolio from './Portfolio.jsx';
 import Biopage from './Biopage.jsx';
 import TileSection from './TileSection.jsx';
@@ -304,11 +305,11 @@ menuEntry(label, func) {
     socialMedia() {
     return (
          <span class="socials">
-           <a href="https://www.instagram.com/brian.figures/" rel="noreferrer" target="_none"><img src="images/insta.png" alt="Instagram logo" height="25px"/></a>
+           <a href="https://www.instagram.com/brian.figures/" rel="noreferrer" target="_none"><img src="images/insta.png" alt="Instagram logo" height="20px"/></a>
            <span class="socialSpace"/>
-           <a href="https://www.facebook.com/brian.lynn.artist" rel="noreferrer" target="_none"><img src="images/fb.png"   alt="Facebook logo" height="25px"/></a>
+           <a href="https://www.facebook.com/brian.lynn.artist" rel="noreferrer" target="_none"><img src="images/fb.png"   alt="Facebook logo" height="20px"/></a>
            <span class="socialSpace"/>
-           <a rel="noreferrer" target="_blank" href="https://www.linkedin.com/in/brian-lynn-abb929/"><img src="images/linkedin.png" alt="LinkedIn logo" height="25px"/></a>
+           <a rel="noreferrer" target="_blank" href="https://www.linkedin.com/in/brian-lynn-abb929/"><img src="images/linkedin.png" alt="LinkedIn logo" height="20px"/></a>
         </span>
         );
     }

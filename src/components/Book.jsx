@@ -1,19 +1,20 @@
 import { Component, createElement } from 'react';
-
 import React from "react";
 import { Link } from "react-router-dom";
-
+import { Authenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
 import TileSection from "./TileSection.jsx";
 import { parseTopic } from './TileSection.jsx';
 import TileSelector from "./TileSelector.jsx";
 import Chapter from './Chapter.jsx';
-
+import kteeHtml from "../assets/KinkyThreesomesandEmpatheticEconomics.html?raw";
 export default class Book extends Component {
 
 	constructor(props) {
 		super(props);
 		this.filename = this.props.filename;
 		//this.myContents = require(this.filename);
+		this.rawhtml = "";
 		this.loadHtml = this.loadHtml.bind(this);
 		this.renderChapter = this.renderChapter.bind(this);
 		this.selectChapter = this.selectChapter.bind(this);
@@ -47,7 +48,10 @@ componentDidUpdate(prevProps, prevState) {
 
 	loadHtml () {
 	    if (this.loaded) return;
-		this.rawhtml = require("../writing/KinkyThreesomesandEmpatheticEconomics.html");
+		//this.rawhtml = import("../assets/KinkyThreesomesandEmpatheticEconomics.html?raw");
+        //this.rawhtml = (await import("../assets/KinkyThreesomesandEmpatheticEconomics.html?raw")).default;
+
+		this.rawhtml = kteeHtml;
 	    this.loaded = true;
 	}
 
@@ -80,19 +84,44 @@ componentDidUpdate(prevProps, prevState) {
 	   //this.parseHtml();
 	   this.loadHtml();
 
-	        return (
-	        <div>
-	        <h1 style={{valign:'center'}}>Kinky Threesomes and Empathetic Economics</h1>
-	        {this.renderChapter(0, "Author's Note", "images/book/note.jpg")}
-	        {this.renderChapter(1, "And so it begins",  "images/book/chap1.jpg", "images/book/chap1end.jpg")}
-	        {this.renderChapter(2, "Or did it begin here?", "images/book/chap2.jpg", "images/book/chap2end.jpg")}
-	        {this.renderChapter(3, "Here. It actually began here.", "images/book/chap3.jpg", "images/book/chap3end.jpg")}
-	        {this.renderChapter(4, "The Arrow", "images/book/chap4.jpg", "images/book/chap4end.jpg")}
-	        {this.renderChapter(5, "The Nerd", "images/book/chap5.jpg", "images/book/chap5end.jpg")}
-	        {this.renderChapter(9, "Relating")}
-	        {this.renderChapter(18, "Polyamory")}
-	        </div>
-	        );
+       // return this.renderBook();
+
+       return (
+              <Authenticator>
+                    {({ signOut, user }) => (
+                    <div>
+                        {this.renderBook()}
+                        <button onClick={signOut}>Sign out</button>
+                    </div>
+                )}
+              </Authenticator>
+        );
+
+	}
+
+	 renderBook() {
+		 return (
+		    <div>
+    	        <h1 style={{valign:'center'}}>Kinky Threesomes and Empathetic Economics</h1>
+    	        {this.renderChapters()}
+    	     </div>
+    	 );
+	}
+
+
+	renderChapters() {
+         return (
+            <div>
+                {this.renderChapter(0, "Author's Note", "images/book/note.jpg")}
+                {this.renderChapter(1, "And so it begins",  "images/book/chap1.jpg", "images/book/chap1end.jpg")}
+                {this.renderChapter(2, "Or did it begin here?", "images/book/chap2.jpg", "images/book/chap2end.jpg")}
+                {this.renderChapter(3, "Here. It actually began here.", "images/book/chap3.jpg", "images/book/chap3end.jpg")}
+                {this.renderChapter(4, "The Arrow", "images/book/chap4.jpg", "images/book/chap4end.jpg")}
+                {this.renderChapter(5, "The Nerd", "images/book/chap5.jpg", "images/book/chap5end.jpg")}
+                {this.renderChapter(9, "Relating")}
+                {this.renderChapter(18, "Polyamory")}
+            </div>
+            );
 	}
 
 	selectChapter (topic) {

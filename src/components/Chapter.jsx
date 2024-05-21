@@ -42,6 +42,10 @@ export default class Chapter extends Component {
             }
         }
     }
+    if (!this.skipping && node.name === "p") {
+        node.style = { display : "block"};
+        return node;
+    }
     return this.skipping ? <> </> : null;
     }
 };

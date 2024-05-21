@@ -3,8 +3,8 @@ import '@aws-amplify/ui-react/styles.css'
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import './App.css';
-import {  BrowserRouter, Routes, Route, useNavigate, useSearchParams, useHistory } from 'react-router-dom'
-import React, { useState, useEffect, useRef } from "react";
+import {  Routes, Route, useNavigate, useSearchParams } from 'react-router-dom'
+import  { useState, useEffect } from "react";
 import { createBrowserHistory } from "history";
 import BrianSite from './components/BrianSite.jsx';
 import doScroll from './components/Scroller.jsx'
@@ -30,7 +30,7 @@ function App() {
     client.models.Todo.delete({ id })
   }
 
-  function renderAuthToDoList() {
+  function AuthToDoList() {
 
   return (
 
@@ -60,6 +60,10 @@ function App() {
       );
     }
 
+  function AuthTest () {
+    return (<h1>Hello</h1>);
+  }
+
 
   function renderBrianSite() {
 
@@ -76,7 +80,8 @@ function App() {
 
 function routeSite() {
   const nav = useNavigate();
-  let [searchParams, setSearchParams] = useSearchParams();
+  let [searchParams] = useSearchParams();
+  let auth = <AuthToDoList/>;
 
    return (
             <Routes>
@@ -86,12 +91,13 @@ function routeSite() {
                 {createRoute("/port", "Portfolio", nav, searchParams)}
                 {createRoute("/news", "News", nav, searchParams)}
                 {createRoute("/book", "Book", nav, searchParams)}
+                <Route path="/todo" element={auth}/>
             </Routes>
         );
 }
 
 
-function createRoute (path, sel, nav, searchParams) {
+function createRoute (path , sel , nav, searchParams) {
 
    var elem = <BrianSite sel={sel} hist={history} nav={nav} searchParams={searchParams} />;
     return (
