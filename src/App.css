@@ -402,7 +402,15 @@ border: 1px solid green;
     color: red
 }
 
+.inputLabel {
+    padding-right: 25px;
+   background : lightGrey;
+}
 
+.input {
+    background: #669999;
+    width: 100px;
+}
 .c0 {
     display: block;
 }

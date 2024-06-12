@@ -2,11 +2,13 @@
 import './App.css'
 import BrianSite from './components/BrianSite.jsx';
 
-import {   Routes, Route, useNavigate, useSearchParams } from 'react-router-dom'
+import {   Routes, Route, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import  {  useEffect  } from "react";
 
 import { createBrowserHistory } from "history";
 import doScroll from './components/Scroller.jsx'
+
+import { generateClient } from "aws-amplify/data";
 
 
 
@@ -56,27 +58,34 @@ let history = createBrowserHistory();
 
 
 function routeSite() {
-  const nav = useNavigate();
-  let [searchParams] = useSearchParams();
+
+
  // let auth = <AuthToDoList/>;
 
    return (
             <Routes>
-                {createRoute("/", "", nav, searchParams)}
-                {createRoute("/bio", "Bio", nav, searchParams)}
-                {createRoute("/bio?topic=*", "Bio", nav, searchParams)}
-                {createRoute("/port", "Portfolio", nav, searchParams)}
-                {createRoute("/news", "News", nav, searchParams)}
-                {createRoute("/book", "Book", nav, searchParams)}
+                {createRoute("/", "" )}
+                {createRoute("/bio", "Bio")}
+                {createRoute("/bio?topic=*", "Bio")}
+                {createRoute("/port", "Portfolio")}
+                {createRoute("/news", "News")}
+                {createRoute("/book", "Book")}
                 { /* <Route path="/todo" element={auth}/>  */ }
             </Routes>
         );
 }
 
 
-function createRoute (path :string, sel: string , nav: Function, searchParams: URLSearchParams) {
+function createRoute (path :string, sel: string  ) {
+  const nav = useNavigate();
+  let [searchParams] = useSearchParams();
+    const location = useLocation();
+    const { hash, pathname, sp } = location;
+    const myloc = pathname + (searchParams?  "?" + searchParams : "");
+//    alert("loc = "+myloc + ", sp ="+searchParams);
 
-   var elem = <BrianSite sel={sel} hist={history} nav={nav} searchParams={searchParams} />;
+  const url = window.location.href;
+   var elem = <BrianSite sel={sel} hist={history} nav={nav} searchParams={searchParams} location={myloc} />;
     return (
         <Route path={path} element={elem} />
         );

@@ -12,6 +12,10 @@ export function parseTopic(searchParams) {
         return parseParam(searchParams, 'topic');
 }
 
+export function parseMode(searchParams) {
+        return parseParam(searchParams, 'mode');
+}
+
 export function parseSubtopic(searchParams) {
         return parseParam(searchParams, 'subtopic');
 }

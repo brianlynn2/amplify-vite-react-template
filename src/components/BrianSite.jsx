@@ -7,9 +7,12 @@ import 'react-slideshow-image/dist/styles.css';
 import Portfolio from './Portfolio.jsx';
 import Biopage from './Biopage.jsx';
 import TileSection from './TileSection.jsx';
+import {  parseMode } from './TileSection.jsx';
 import { generateUrl} from './TileSection.jsx';
 import { doScroll, setScrollId } from './Scroller.jsx';
 import Book from './Book.jsx';
+import { track } from './Tracker.jsx';
+//import {Persister} from './Persister.jsx';
 
 
 // banner constants
@@ -28,7 +31,6 @@ const divStyle = {
   backgroundSize: 'cover',
   height: '400px'
 }
-
 
 
 
@@ -64,7 +66,6 @@ const slideImages = [
 export default class BrianSite extends Component {
 
 
-
 	constructor(props) {
 
 		super(props);
@@ -73,10 +74,17 @@ export default class BrianSite extends Component {
 		 if (!s) s = "";
 
 		this.state = {
-			selected : s
+			selected : s,
+			location : this.props.location,
+			lastUpdate : Date.now(),
+			cumTime : 0,
+			perister : null
 			};
 
+//        alert("location is "+ this.state.location);
 		this.selectSection = this.selectSection.bind(this);
+		this.track = this.track.bind(this);
+		this.setPersister = this.setPersister.bind(this);
 		//this.navigateSection = this.navigateSection.bind(this);
 	}
 
@@ -87,16 +95,81 @@ componentDidUpdate(prevProps, prevState) {
   if (curSel !== preSel) {
      this.setState({ selected: curSel});
   }
+  var loc = this.props.location;
+  var prevloc = prevProps.location;
+  if (loc !== prevloc) {
+    this.recordStats();
+    this.state.location = loc;
+    this.state.cumTime = 0;
+    this.state.lastUpdate = Date.now();
+//    alert("set location state to "+loc);
+  }
 }
+
+recordStats() {
+    var per = this.state.persister;
+    if (per) per(this.state.location, this.state.cumTime);
+//    var perName = per? per() : "unknown";
+    //alert("Recording stats, loc="+this.state.location+" cumulative time = "+ this.state.cumTime);
+    //track(1,1,1);
+}
+
+setPersister(per) {
+    this.state.persister = per;
+  //  alert("set persister to "+name);
+}
+
+ handleScroll = (event) => {
+    var targ = event.target;
+ //   var prnt = targ.parentElement;
+    var top = targ.scrollTop;
+    var offTop = targ.offsetTop;
+    var winht = window.innerHeight -50 ;
+   // var winht = 0;
+    var bot = top + winht;
+    var ht = targ.scrollHeight;
+
+    var top_pct = Math.round(100 * top/ht);
+    var bot_pct = Math.round(100 * bot/ht);
+
+    var msg = "Top="+Math.round(top) +
+    ",otop="+offTop+
+    ",ht="+ ht +
+    ",top%=" +top_pct  +
+    ",win ht=" +winht+
+    ",bot="+Math.round(bot)+
+    ",bot%="+bot_pct;
+
+    document.title = msg;
+    //alert("scroll, scroll top="+event.target.scrollTop+", ht ="+event.target.offsetHeight);
+    this.track(top, bot, ht);
+};
+
+    track (topPos, bottomPos, ht) {
+        var topPct = topPos /ht;
+        var botPct = bottomPos / ht;
+        var ts = Date.now();
+        var incrementalTime = ts - this.state.lastUpdate;
+        incrementalTime = Math.min(incrementalTime, 30000);
+        var cumTime = this.state.cumTime;
+        cumTime = cumTime + incrementalTime/1000;
+
+//        alert("tracker got top%="+topPct+", bot%="+botPct+" inc time="+incrementalTime+", cum time="+this.state.cumTime);
+       // this.setState({cumTime : cumTime, lastUpdate : ts});
+            this.state.cumTime = cumTime;
+            this.state.lastUpdate = ts;
+    }
+
 
    render () {
     const bodytop = "bodytop";
+    const hs = this.handleScroll;
      return (
     <div className="App" >
         <div class = "content" id={bodytop}>
         {setScrollId(bodytop)}
         { this.mainMenu() }
-            <div class="Scrollable">
+            <div class="Scrollable" onScroll={hs}>
                 <div className="centerBody">
                     { this.banner() }
                     { this.writeup()}
@@ -105,7 +178,6 @@ componentDidUpdate(prevProps, prevState) {
                 { this.footer() }
             </div>
         </div>
-
     </div>
     );
     }
@@ -117,7 +189,7 @@ componentDidUpdate(prevProps, prevState) {
 
 
     banner() {
-
+        if (this.state.selected !== '') return;
         return (
             <div class="banner" style={{position : 'relative'}}>
                 <Slide duration="1000" transition="2000" >
@@ -174,6 +246,8 @@ mainMenu() {
         </div>
     );
 }
+
+
 
 menuEntry(label, func) {
     var st = this.state.selected;
@@ -266,13 +340,17 @@ menuEntry(label, func) {
 
 
     ktee () {
+        var mode = parseMode(this.props.searchParams);
+        var hideImage = mode === "signin";
+        //if (hideImage) alert("hide KTEE bg image");
         return (
             <TileSection
             select={this.selectSection} selected={this.state.selected}  nav ={this.props.nav}  searchParams={this.props.searchParams}
     	    title = "Book" image = "images/writing2.png"
                            summary = "Kinky Threesomes and Empathetic Economics (novel in progress)"
-                            bgImage = "images/book/cover.jpg">
+                            bgImage = "images/book/cover.jpg" skipBgImage={hideImage}>
                      <Book title = "Kinky Threesomes and Empathetic Economics" nav ={this.props.nav}  searchParams={this.props.searchParams}
+                            setPersister = {this.setPersister}
                 	            />
     	    </TileSection>
     	    );

@@ -1,13 +1,39 @@
-import { Component, createElement } from 'react';
+import { Component, createElement, useState, useEffect } from 'react';
 import React from "react";
 import { Link } from "react-router-dom";
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator  } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import TileSection from "./TileSection.jsx";
-import { parseTopic } from './TileSection.jsx';
+import { parseTopic, parseMode } from './TileSection.jsx';
 import TileSelector from "./TileSelector.jsx";
 import Chapter from './Chapter.jsx';
 import kteeHtml from "../assets/KinkyThreesomesandEmpatheticEconomics.html?raw";
+import Math from 'math';
+import { initTracker} from './Tracker.jsx';
+import { persistTrackingInfo, Persister }from './Persister.tsx';
+
+
+
+
+
+const cyrb53 = (str, seed = 0) => {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
+
+
+
 export default class Book extends Component {
 
 	constructor(props) {
@@ -18,10 +44,19 @@ export default class Book extends Component {
 		this.loadHtml = this.loadHtml.bind(this);
 		this.renderChapter = this.renderChapter.bind(this);
 		this.selectChapter = this.selectChapter.bind(this);
+		this.renderModeSelector = this.renderModeSelector.bind(this);
+		this.renderModeRadioButton = this.renderModeRadioButton.bind(this);
+		this.setMode = this.setMode.bind(this);
+		this.updateInviteEmail = this.updateInviteEmail.bind(this);
+		this.updateInviteHash = this.updateInviteHash.bind(this);
 //		this.chapterTitles = "";
 //		this.foundCh = false;
+
+
 		this.initState();
+
 	}
+
 
 componentDidUpdate(prevProps, prevState) {
     var curSel = this.props.searchParams;
@@ -34,16 +69,46 @@ componentDidUpdate(prevProps, prevState) {
 
 	initState() {
         const topic = this.getTopic();
+        const mode  = this.getMode();
  //       alert("book topic="+topic);
+        //var mode = "request";
         this.state = {
             selected : topic,
+            mode : mode,
+            inviteEmail : '',
+            inviteHash : '',
             };
-        this.setState ( { selected : topic});
+        this.setState ( { selected : topic, mode : mode});
     }
 
     getTopic() {
             return parseTopic(this.props.searchParams);
     }
+    getMode() {
+            return parseMode(this.props.searchParams);
+    }
+
+    setMode (event) {
+        var myMode = event.target.value;
+  //      alert("set mode to "+myMode);
+        this.setState ( {mode : myMode});
+        const url = "book?mode="+myMode;
+        this.props.nav(url);
+    }
+
+    updateInviteEmail (event) {
+        var myEmail = event.target.value;
+      //  alert("update invite email: "+myEmail);
+        this.setState( {inviteEmail: myEmail});
+    }
+
+
+    updateInviteHash (event) {
+        var myHash = event.target.value;
+      //  alert("update invite hash: "+myHash);
+        this.setState( {inviteHash: myHash});
+    }
+
 
 
 	loadHtml () {
@@ -67,12 +132,13 @@ componentDidUpdate(prevProps, prevState) {
         } else {
             desc = num ===0 ? desc : fulldesc
         }
+        var prefix = "?mode=signin&topic=";
         var nextChap = "Chapter" +(num + 1);
-        var link = "/book?topic="+ nextChap;
+        var link = prefix + nextChap;
 	       return (
             <TileSection title = {title} select={this.selectChapter} selected={this.state.selected} page="book" nav ={this.props.nav}
                                     image = "images/writing2.png"  summary = {desc}
-                                    bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} >
+                                    bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} prefix={prefix}  >
 	            <Chapter rawHtml = {this.rawhtml} chapter={num} />
 	            { tailImage ? <img src={tailImage} class="sectionImageWrapper"  alt="final image" /> : <> </>}
 	           <div style={{marginTop: "10px", marginBottom: "10px"}}> <Link to={link}>Next Chapter</Link></div>
@@ -80,18 +146,146 @@ componentDidUpdate(prevProps, prevState) {
 	       );
     }
 
-	render () {
-	   //this.parseHtml();
-	   this.loadHtml();
 
-       // return this.renderBook();
+	render () {
+        var mode = this.state.mode;
 
        return (
-              <Authenticator>
+            <div>
+                {this.renderModeSelector() }
+                { this.renderBookPanel(mode) }
+            </div>
+        );
+
+	}
+
+    renderBookPanel (mode) {
+        if (mode=== "request") return this.renderRequest();
+        if (mode=== "signup") return this.renderInvitation();
+        if (mode=== "signin") return this.renderAuthBook(false);
+    }
+
+	renderRequest() {
+	    return (<>
+	    <h2>Requesting access</h2>
+	    <p>Please e-mail a request to brian (at) brianlynn.ca for an invitation code.</p>
+	    <p>You will need your e-mail address and your invitation code to create an account.</p>
+	    </>);
+	}
+
+	renderInvitation() {
+	    //var dispCode = genHash(this.state.inviteEmail);
+	    //var dispCode = 'foo';
+	    var myEmail = this.state.inviteEmail;
+	    var dispCode = this.genHash(myEmail);
+	    var myHash = this.state.inviteHash;
+//	    alert("render - my email = "+myEmail+", hash = "+myHash);
+	    var okInvite = this.checkHash(myEmail, myHash);
+	    //var okInvite = true;
+//	    alert("render: dispCode="+dispCode);
+        if (okInvite) return this.renderSignup();
+	    return (
+	    <>
+	    <h2>Please Sign Up here:</h2>
+	    <table>
+	    <tr>
+	    <td class="inputLabel">Enter your e-mail address:</td>
+	    <td class="input"><input class="input" style={{ width:"250px" }} size="40" name="invite_email" type="email" onChange={this.updateInviteEmail}/></td>
+	    </tr>
+	    <tr>
+	    <td class="inputLabel">Enter your invitation code:</td>
+	    <td ><input class="input" style={{ width:"200px" }} name="invite_code" onChange={this.updateInviteHash}/></td>
+	    </tr>
+	    </table>
+	    <p>Invite ok: {"" + okInvite}</p>
+	    <p>Invitation code is {dispCode}</p>
+	    </>);
+	}
+
+    renderSignup() {
+       return (
+              <Authenticator  initialState="signUp"
+                    socialProviders={['amazon', 'facebook','google', 'apple']}  hideSignIn={true} >
                     {({ signOut, user }) => (
                     <div>
+                    </div>
+                )}
+              </Authenticator>
+        );
+
+    }
+
+    renderSignin() {
+         var ret = this.renderAuthBook(false);
+         return ret;
+    }
+
+	  renderModeSelector() {
+
+        return (
+          <div  class="categorySelector">
+              <p class="categorySelectorLabel">Read the book!</p>
+            { this.renderModeRadioButton("request", "I'm just starting: Request an invitation") }
+            { this.renderModeRadioButton("signup", "I have an invitation code: Sign up") }
+            { this.renderModeRadioButton("signin", "I have an account: Sign in") }
+          </div>
+        );
+
+      }
+
+
+              renderModeRadioButton (mode, label) {
+                  var curMode = this.state.mode;
+                  var isChecked = curMode === mode;
+                    var func = this.setMode;
+                   // var setMode = null;
+      //            alert("Radio button mode="+mode + ", state="+curMode+", checked="+isChecked);
+               // return (<p>bar</p>);
+
+                  return (
+                            <div className="categoryButton">
+                              <label>
+                                <input
+                                  type="radio"
+                                  name="mode"
+                                  value={mode}
+                                  checked={isChecked}
+                                  onChange={func}
+                                  className="categoryInput"
+                                />
+                                {label}
+                              </label>
+                            </div>
+                        );
+
+              }
+
+
+    genHash(str) {
+        return cyrb53(str);
+    }
+
+    checkHash(str, hash) {
+        var newhash = "" + this.genHash(str);
+        var ok = newhash === hash;
+  //      alert("check hash of "+str+ " (new has = "+newhash+")  vs  "+ hash + " = "+ok);
+        return ok;
+    }
+
+	renderAuthBook (allowSignup) {
+
+       return (
+              <Authenticator
+                    socialProviders={['amazon', 'facebook','google', 'apple']}  hideSignUp={!allowSignup} >
+                    {({ signOut, user }) => (
+                    <div>
+
                         {this.renderBook()}
                         <button onClick={signOut}>Sign out</button>
+                        <div>
+                            <h3>Tracking info</h3>
+                            <Persister/>
+                        </div>
                     </div>
                 )}
               </Authenticator>
@@ -99,7 +293,12 @@ componentDidUpdate(prevProps, prevState) {
 
 	}
 
+
 	 renderBook() {
+	 	   this.loadHtml();
+
+	 	   this.props.setPersister(persistTrackingInfo);
+
 		 return (
 		    <div>
     	        <h1 style={{valign:'center'}}>Kinky Threesomes and Empathetic Economics</h1>
