@@ -127,11 +127,13 @@ export default class TileSection extends Component {
 
 	    var hasSelection = selected !== '';
 	    var isSelected = this.isTileSelected();
+
 //	    alert("section = "+myTitle+", my topic="+myTopic+", selected="+selected);
 
         return (
 	        hasSelection ?
-	            isSelected ? this.renderFull() : this.renderShrunk()
+	            isSelected ? this.renderFull() :
+	            this.props.skipClosedSections ? <></> : this.renderShrunk()
 	        :   this.renderTile()
 	    );
 	}

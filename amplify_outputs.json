@@ -34,8 +34,8 @@
     "model_introspection": {
       "version": 1,
       "models": {
-        "Todo": {
-          "name": "Todo",
+        "Tracking": {
+          "name": "Tracking",
           "fields": {
             "id": {
               "name": "id",
@@ -44,10 +44,17 @@
               "isRequired": true,
               "attributes": []
             },
-            "content": {
-              "name": "content",
+            "location": {
+              "name": "location",
               "isArray": false,
               "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "cumTime": {
+              "name": "cumTime",
+              "isArray": false,
+              "type": "Float",
               "isRequired": false,
               "attributes": []
             },
@@ -69,7 +76,7 @@
             }
           },
           "syncable": true,
-          "pluralName": "Todos",
+          "pluralName": "Trackings",
           "attributes": [
             {
               "type": "model",

@@ -140,7 +140,7 @@ setPersister(per) {
     ",bot="+Math.round(bot)+
     ",bot%="+bot_pct;
 
-    document.title = msg;
+    /* document.title = msg; */
     //alert("scroll, scroll top="+event.target.scrollTop+", ht ="+event.target.offsetHeight);
     this.track(top, bot, ht);
 };

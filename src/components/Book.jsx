@@ -134,16 +134,28 @@ componentDidUpdate(prevProps, prevState) {
         }
         var prefix = "?mode=signin&topic=";
         var nextChap = "Chapter" +(num + 1);
+        var prevChap = num > 1 ? "Chapter"+(num-1)  : num === 1 ? "AuthorsNote" : "";
         var link = prefix + nextChap;
+        var prevLink = prevChap === "" ? null : prefix + prevChap;
+
 	       return (
             <TileSection title = {title} select={this.selectChapter} selected={this.state.selected} page="book" nav ={this.props.nav}
                                     image = "images/writing2.png"  summary = {desc}
-                                    bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} prefix={prefix}  >
+                                    bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} prefix={prefix}
+                                      skipClosedSections = {true}>
+	            { this.renderLink("Previous Chapter", prevLink)}
 	            <Chapter rawHtml = {this.rawhtml} chapter={num} />
 	            { tailImage ? <img src={tailImage} class="sectionImageWrapper"  alt="final image" /> : <> </>}
-	           <div style={{marginTop: "10px", marginBottom: "10px"}}> <Link to={link}>Next Chapter</Link></div>
+	            { this.renderLink("Next Chapter", link)}
 	       </TileSection>
 	       );
+    }
+
+    renderLink(label, link) {
+        if (!link || link==="") return <></>;
+        return (
+    	           <div style={{marginTop: "10px", marginBottom: "10px"}}> <Link to={link}>{label}</Link></div>
+        );
     }
 
 

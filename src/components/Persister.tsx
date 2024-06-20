@@ -6,43 +6,76 @@ import { Component, createElement, useState, useEffect } from 'react';
 const client = generateClient<Schema>();
 
 export function persistTrackingInfo(location, cumTime) {
-
+    var msg = "persister";
     if (location && cumTime) {
-        const msg = "persist tracking info: "+location +" for "+ cumTime;
-        alert(msg);
-        createTodo(msg);
+        msg = "persist tracking info: "+location +" for "+ cumTime;
+      //  alert(msg);
+        updateTracking(location, cumTime);
     }
-            return (<p>{msg}</p>);
+    return (<p>{msg}</p>);
 }
 
 
-  function createTodo(myContent) {
-    client.models.Todo.create({ content:myContent  });
+  function createTracking(location, cumTime) {
+    client.models.Tracking.create({ id: location, location:location, cumTime : cumTime });
   }
 
-  function deleteTodo(id) {
-    client.models.Todo.delete({ id })
+    function updateTracking(location, cumTime) {
+
+    var track;
+    client.models.Tracking.get({ id: location, }).then(
+        (retval) => { saveTracking(retval.data, cumTime)},
+        createTracking(location, cumTime));
+
+/*
+
+    //promise.then({(ret) => {track = ret}});
+
+      if (!track) return createTracking(location, cumTime);
+      const priorTime = track.cumTime;
+
+    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime};
+    client.models.Tracking.update(newTracking);
+    */
+    }
+
+function saveTracking(track, cumTime) {
+    const priorTime = track.cumTime;
+    const location = track.location;
+    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime};
+    client.models.Tracking.update(newTracking);
+}
+
+  function deleteTracking(id) {
+    client.models.Tracking.delete({ id })
   }
+
+
+      export function isPersisted (key) {
+      /*
+        return trackings.reduce(
+            (accumulator, curval) =>  accumulator ? accumulator :
+                curval.id === key ? curval : null);
+                */
+      }
 
 export function Persister () {
 
-    const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-
-
-		  useEffect(() => {
-            client.models.Todo.observeQuery().subscribe({
-              next: (data) => setTodos([...data.items]),
-            });
-          }, []);
+    const [trackings, setTrackings] = useState<Array<Schema["Tracking"]["type"]>>([]);
+      useEffect(() => {
+        client.models.Tracking.observeQuery().subscribe({
+          next: (data) => setTrackings([...data.items]),
+        });
+      }, []);
 
   //  return (<p>tracking info</p>);
 
         return(
                       <ul>
-                                 {todos.map((todo) => (
+                                 {trackings.map((tracking) => (
                                    <li
-                                   onClick={() => deleteTodo(todo.id)}
-                                   key={todo.id}>{todo.content}</li>
+                                   onClick={() => deleteTracking(tracking.id)}
+                                   key={tracking.id}>ID: {tracking.id}, loc={tracking.location},created at {tracking.createdAt}, updated at {tracking.updateAt}, cum time {tracking.cumTime}</li>
                                  ))}
                                </ul>
         );

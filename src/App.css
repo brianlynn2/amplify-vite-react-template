@@ -5,6 +5,20 @@
   text-align: center;
 }
 
+p {
+    font-size:13pt!important;
+}
+
+.c1 {
+    font-size:13pt!important;
+}
+
+.c0 {
+    margin-left: 50px!important;
+    margin-right: 50px!important;
+    margin-bottom: 6px!important;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -453,6 +467,10 @@ border: 1px solid green;
     padding:12pt 12pt 12pt 12pt !important;
 }
 
+.c0 {
+    margin-left: 25px!important;
+    margin-right: 25px!important;
+}
 
 }
 
@@ -514,6 +532,10 @@ border: 1px solid green;
     height: 240px;
 }
 
+.c0 {
+    margin-left: 0px!important;
+    margin-right: 0px!important;
+}
 
 }
 
