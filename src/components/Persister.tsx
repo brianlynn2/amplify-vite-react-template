@@ -59,14 +59,19 @@ function saveTracking(track, cumTime) {
                 */
       }
 
-export function Persister () {
+export function Persister (props) {
 
     const [trackings, setTrackings] = useState<Array<Schema["Tracking"]["type"]>>([]);
+    var setter = props.setTracking;
+    if(!setter) setter= setTrackings;
+
       useEffect(() => {
         client.models.Tracking.observeQuery().subscribe({
-          next: (data) => setTrackings([...data.items]),
+          next: (data) => setter([...data.items]),
         });
       }, []);
+
+
 
   //  return (<p>tracking info</p>);
 

@@ -49,6 +49,7 @@ export default class Book extends Component {
 		this.setMode = this.setMode.bind(this);
 		this.updateInviteEmail = this.updateInviteEmail.bind(this);
 		this.updateInviteHash = this.updateInviteHash.bind(this);
+		this.setTrackingInfo = this.setTrackingInfo.bind(this);
 //		this.chapterTitles = "";
 //		this.foundCh = false;
 
@@ -77,6 +78,7 @@ componentDidUpdate(prevProps, prevState) {
             mode : mode,
             inviteEmail : '',
             inviteHash : '',
+            trackingInfo : null,
             };
         this.setState ( { selected : topic, mode : mode});
     }
@@ -95,6 +97,20 @@ componentDidUpdate(prevProps, prevState) {
         const url = "book?mode="+myMode;
         this.props.nav(url);
     }
+
+    setTrackingInfo (track) {
+        this.setState( { trackingInfo: track});
+    }
+
+     isTracked (key) {
+        var trackings = this.state.trackingInfo;
+        if (!trackings) return false;
+
+            return trackings.reduce(
+                (accumulator, curval) =>  accumulator ? accumulator :
+                    curval.id === key ? curval : null);
+          }
+
 
     updateInviteEmail (event) {
         var myEmail = event.target.value;
@@ -134,15 +150,20 @@ componentDidUpdate(prevProps, prevState) {
         }
         var prefix = "?mode=signin&topic=";
         var nextChap = "Chapter" +(num + 1);
+        var curChap =  num > 0 ? "Chapter"+num : "AuthorsNote";
         var prevChap = num > 1 ? "Chapter"+(num-1)  : num === 1 ? "AuthorsNote" : "";
         var link = prefix + nextChap;
         var prevLink = prevChap === "" ? null : prefix + prevChap;
+
+        var seen = this.isTracked(prefix+curChap);
+        var seenLabel = seen ? "<p>Seen</p>" : <></>;
 
 	       return (
             <TileSection title = {title} select={this.selectChapter} selected={this.state.selected} page="book" nav ={this.props.nav}
                                     image = "images/writing2.png"  summary = {desc}
                                     bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} prefix={prefix}
                                       skipClosedSections = {true}>
+                { seenLabel}
 	            { this.renderLink("Previous Chapter", prevLink)}
 	            <Chapter rawHtml = {this.rawhtml} chapter={num} />
 	            { tailImage ? <img src={tailImage} class="sectionImageWrapper"  alt="final image" /> : <> </>}
@@ -296,7 +317,7 @@ componentDidUpdate(prevProps, prevState) {
                         <button onClick={signOut}>Sign out</button>
                         <div>
                             <h3>Tracking info</h3>
-                            <Persister/>
+                            <Persister setTracking={this.setTrackingInfo}/>
                         </div>
                     </div>
                 )}
