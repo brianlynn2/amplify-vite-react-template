@@ -11,6 +11,8 @@ const schema = a.schema({
     .model({
       location: a.string(),
       cumTime: a.float(),
+      top: a.float(),
+      bottom : a.float()
     })
     .authorization((allow) => [allow.owner()]),
 });

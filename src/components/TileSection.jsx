@@ -58,6 +58,8 @@ export default class TileSection extends Component {
 //		this.state = {
 //			isOpen : this.props.isOpen,
 //		};
+        var st = this.props.status;
+        this.setState(  { status : st?  st : "Unseen" });
 		this.selectTile = this.selectTile.bind(this);
 		this.setSelected = this.setSelected.bind(this);
 		this.setSelector = this.setSelector.bind(this);
@@ -68,14 +70,14 @@ export default class TileSection extends Component {
 	}
 
     componentDidUpdate(prevProps, prevState) {
-/*        var curSel = this.props;
+        var curSel = this.props;
         var preSel = prevProps;
-         alert("component did update with cur="+curSel+", prev="+preSel+", selected="+this.props.selected);
+       //  alert("component did update with cur="+curSel+", prev="+preSel+", selected="+this.props.selected);
       if (curSel !== preSel) {
        	    this.setState( {
-                      selected :  this.props.selected
+                      status :  this.props.status
                });
-      }*/
+      }
 //      this.doTileScroll();
         doScroll();
     }
@@ -240,9 +242,13 @@ export default class TileSection extends Component {
      	    if (isDeselect) {
      	        setScrollId(myId);
      	    }
+     	    var myClass = "sectionTitleBand";
 
+     	    var status = this.props.status;
+     	    if (status === "Finished") myClass = myClass + " sectionTitleFinished";
+     	    if (status === "InProgress") myClass = myClass + " sectionTitleInProgress";
      	    return (
-                     <div  id={myId} class="sectionTitleBand"  onClick={ isDeselect  ? () => this.selectTile('') : null}>
+                     <div  id={myId} class={myClass}  onClick={ isDeselect  ? () => this.selectTile('') : null}>
                          <IconImage src={myImage} height = "25"/>
                          <span class="sectionTitle">{myTitle}</span>
                      </div>

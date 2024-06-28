@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 import { Authenticator  } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import TileSection from "./TileSection.jsx";
-import { parseTopic, parseMode } from './TileSection.jsx';
+import { parseTopic, parseMode, parseParam } from './TileSection.jsx';
 import TileSelector from "./TileSelector.jsx";
 import Chapter from './Chapter.jsx';
 import kteeHtml from "../assets/KinkyThreesomesandEmpatheticEconomics.html?raw";
 import Math from 'math';
 import { initTracker} from './Tracker.jsx';
-import { persistTrackingInfo, Persister }from './Persister.tsx';
+import { persistTrackingInfo, Persister, deleteAllTrackings }from './Persister.tsx';
 
 
 
@@ -50,6 +50,7 @@ export default class Book extends Component {
 		this.updateInviteEmail = this.updateInviteEmail.bind(this);
 		this.updateInviteHash = this.updateInviteHash.bind(this);
 		this.setTrackingInfo = this.setTrackingInfo.bind(this);
+		this.renderClearTracking = this.renderClearTracking.bind(this);
 //		this.chapterTitles = "";
 //		this.foundCh = false;
 
@@ -71,16 +72,20 @@ componentDidUpdate(prevProps, prevState) {
 	initState() {
         const topic = this.getTopic();
         const mode  = this.getMode();
+        const email = this.getInviteEmail();
+        const code = this.getInviteHash();
+
  //       alert("book topic="+topic);
         //var mode = "request";
         this.state = {
             selected : topic,
             mode : mode,
-            inviteEmail : '',
-            inviteHash : '',
+            inviteEmail : email,
+            inviteHash : code,
             trackingInfo : null,
+
             };
-        this.setState ( { selected : topic, mode : mode});
+       // this.setState ( { selected : topic, mode : mode});
     }
 
     getTopic() {
@@ -89,6 +94,15 @@ componentDidUpdate(prevProps, prevState) {
     getMode() {
             return parseMode(this.props.searchParams);
     }
+
+    getInviteEmail() {
+        return parseParam(this.props.searchParams, "email");
+    }
+
+    getInviteHash() {
+        return parseParam(this.props.searchParams, "code");
+    }
+
 
     setMode (event) {
         var myMode = event.target.value;
@@ -102,14 +116,18 @@ componentDidUpdate(prevProps, prevState) {
         this.setState( { trackingInfo: track});
     }
 
-     isTracked (key) {
+     trackStatus (key) {
         var trackings = this.state.trackingInfo;
-        if (!trackings) return false;
+        if (!trackings || trackings.length < 1) return "Unseen";
 
-            return trackings.reduce(
+        var track = trackings.reduce(
                 (accumulator, curval) =>  accumulator ? accumulator :
-                    curval.id === key ? curval : null);
-          }
+                   (curval.id == key ? curval : null), null);
+
+        if (!track) return "Unseen";
+        return track.bottom > 0.95 && track.cumTime > 60 ? "Finished" : "InProgress:" + track.bottom+", t="+track.cumTime;
+
+        }
 
 
     updateInviteEmail (event) {
@@ -155,15 +173,16 @@ componentDidUpdate(prevProps, prevState) {
         var link = prefix + nextChap;
         var prevLink = prevChap === "" ? null : prefix + prevChap;
 
-        var seen = this.isTracked(prefix+curChap);
-        var seenLabel = seen ? "<p>Seen</p>" : <></>;
+        var status = this.trackStatus("/book" + prefix+curChap);
+        status = (status && status.startsWith("InProgress")) ? "InProgress" : status;
+        var seenLabel = <p>{status}</p>;
 
 	       return (
             <TileSection title = {title} select={this.selectChapter} selected={this.state.selected} page="book" nav ={this.props.nav}
                                     image = "images/writing2.png"  summary = {desc}
                                     bgImage =  {bgImage} leaf = {leaf} hideBgImage = {hideBgImage} prefix={prefix}
+                                    status = { status }
                                       skipClosedSections = {true}>
-                { seenLabel}
 	            { this.renderLink("Previous Chapter", prevLink)}
 	            <Chapter rawHtml = {this.rawhtml} chapter={num} />
 	            { tailImage ? <img src={tailImage} class="sectionImageWrapper"  alt="final image" /> : <> </>}
@@ -223,11 +242,11 @@ componentDidUpdate(prevProps, prevState) {
 	    <table>
 	    <tr>
 	    <td class="inputLabel">Enter your e-mail address:</td>
-	    <td class="input"><input class="input" style={{ width:"250px" }} size="40" name="invite_email" type="email" onChange={this.updateInviteEmail}/></td>
+	    <td class="input"><input class="input" style={{ width:"250px" }} size="40" name="invite_email" type="email" value={this.state.inviteEmail} onChange={this.updateInviteEmail}/></td>
 	    </tr>
 	    <tr>
 	    <td class="inputLabel">Enter your invitation code:</td>
-	    <td ><input class="input" style={{ width:"200px" }} name="invite_code" onChange={this.updateInviteHash}/></td>
+	    <td ><input class="input" style={{ width:"200px" }} name="invite_code" value={this.state.inviteHash} onChange={this.updateInviteHash}/></td>
 	    </tr>
 	    </table>
 	    <p>Invite ok: {"" + okInvite}</p>
@@ -314,6 +333,7 @@ componentDidUpdate(prevProps, prevState) {
                     <div>
 
                         {this.renderBook()}
+                        {this.renderClearTracking()}
                         <button onClick={signOut}>Sign out</button>
                         <div>
                             <h3>Tracking info</h3>
@@ -323,9 +343,12 @@ componentDidUpdate(prevProps, prevState) {
                 )}
               </Authenticator>
         );
-
 	}
 
+    renderClearTracking() {
+   //     var del = { deleteAllTrackings(this.state.trackingInfo)};
+       return <button onClick={(e) => { deleteAllTrackings(this.state.trackingInfo)}}>Clear Tracking Info</button>;
+    }
 
 	 renderBook() {
 	 	   this.loadHtml();

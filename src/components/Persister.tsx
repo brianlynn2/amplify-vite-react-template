@@ -5,50 +5,46 @@ import { Component, createElement, useState, useEffect } from 'react';
 
 const client = generateClient<Schema>();
 
-export function persistTrackingInfo(location, cumTime) {
+export function persistTrackingInfo(location, cumTime, top, bottom) {
     var msg = "persister";
     if (location && cumTime) {
         msg = "persist tracking info: "+location +" for "+ cumTime;
       //  alert(msg);
-        updateTracking(location, cumTime);
+        updateTracking(location, cumTime, top, bottom);
     }
     return (<p>{msg}</p>);
 }
 
-
-  function createTracking(location, cumTime) {
-    client.models.Tracking.create({ id: location, location:location, cumTime : cumTime });
-  }
-
-    function updateTracking(location, cumTime) {
+    function updateTracking(location, cumTime, top, bottom) {
 
     var track;
     client.models.Tracking.get({ id: location, }).then(
-        (retval) => { saveTracking(retval.data, cumTime)},
-        createTracking(location, cumTime));
-
-/*
-
-    //promise.then({(ret) => {track = ret}});
-
-      if (!track) return createTracking(location, cumTime);
-      const priorTime = track.cumTime;
-
-    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime};
-    client.models.Tracking.update(newTracking);
-    */
+        (retval) => { saveTracking(retval.data, cumTime, top, bottom)},
+        createTracking(location, cumTime,top, bottom));
     }
 
-function saveTracking(track, cumTime) {
+function saveTracking(track, cumTime, top, bottom) {
     const priorTime = track.cumTime;
+    const priorTop= track.top;
+    const priorBottom = track.bottom;
     const location = track.location;
-    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime};
+    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime, top: Math.min(top, priorTop), bottom: Math.max(bottom, priorBottom)};
     client.models.Tracking.update(newTracking);
 }
 
-  function deleteTracking(id) {
+function createTracking(location, cumTime, top, bottom) {
+    client.models.Tracking.create({ id: location, location:location, cumTime : cumTime, top:top, bottom:bottom });
+    }
+
+
+    function deleteTracking(id) {
     client.models.Tracking.delete({ id })
   }
+
+export  function deleteAllTrackings(data) {
+        if(!data) return;
+        data.map((record) => deleteTracking(record.id));
+    }
 
 
       export function isPersisted (key) {

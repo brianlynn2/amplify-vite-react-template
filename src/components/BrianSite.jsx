@@ -17,7 +17,6 @@ import { track } from './Tracker.jsx';
 
 // banner constants
 const spanStyle = {
-  padding: '20px',
   background: '#efefef',
   opacity: 0.5,
   color: '#000000',
@@ -32,7 +31,26 @@ const divStyle = {
   height: '400px'
 }
 
+const buttonStyle = {
+    width: "20px",
+    height: "40px",
+    padding: "5px 5px",
+//    background: 'none',
+//background:rgba(255,255,255,0.6),
+    opacity: 0.5,
+    border: '0px',
+};
 
+function opaque (ev, op) {
+    const elem = ev.target;
+    if (!elem) return;
+    elem.style.opacity = op;
+}
+
+const sliderProperties = {
+    prevArrow: <button class="buttonStyle" style={{...buttonStyle}} onMouseOver={(e) => opaque(e, 1.0)} onMouseOut={(e) => opaque(e, 0.5)} >&#60;</button>,
+    nextArrow: <button class="buttonStyle" style={{...buttonStyle}}  onMouseOver={(e) => opaque(e, 1.0)} onMouseOut={(e) => opaque(e, 0.5)}  > &#62; </button>
+}
 
 const slideImages = [
   { url: 'images/shameless_images/IMG_7523.jpg'},
@@ -77,6 +95,8 @@ export default class BrianSite extends Component {
 			selected : s,
 			location : this.props.location,
 			lastUpdate : Date.now(),
+			highestPos : 1.0,
+			lowestPos : 0.0,
 			cumTime : 0,
 			perister : null
 			};
@@ -87,6 +107,13 @@ export default class BrianSite extends Component {
 		this.setPersister = this.setPersister.bind(this);
 		//this.navigateSection = this.navigateSection.bind(this);
 	}
+
+componentDidMount() {
+    window.addEventListener("beforeunload", (ev) => { this.track(1,0,1) });
+    window.addEventListener("pagehide", (ev) => { this.track(1,0,1) });
+    window.addEventListener("visibilitychange", (ev) => { this.track(1,0,1) });
+    window.addEventListener("blur", (ev) => { this.track(1,0,1) });
+}
 
 componentDidUpdate(prevProps, prevState) {
     var curSel = this.props.sel;
@@ -101,6 +128,8 @@ componentDidUpdate(prevProps, prevState) {
     this.recordStats();
     this.state.location = loc;
     this.state.cumTime = 0;
+    this.state.lowestPos = 0.0;
+    this.state.highestPos = 1.0;
     this.state.lastUpdate = Date.now();
 //    alert("set location state to "+loc);
   }
@@ -108,7 +137,7 @@ componentDidUpdate(prevProps, prevState) {
 
 recordStats() {
     var per = this.state.persister;
-    if (per) per(this.state.location, this.state.cumTime);
+    if (per) per(this.state.location, this.state.cumTime, this.state.highestPos, this.state.lowestPos);
 //    var perName = per? per() : "unknown";
     //alert("Recording stats, loc="+this.state.location+" cumulative time = "+ this.state.cumTime);
     //track(1,1,1);
@@ -152,12 +181,14 @@ setPersister(per) {
         var incrementalTime = ts - this.state.lastUpdate;
         incrementalTime = Math.min(incrementalTime, 30000);
         var cumTime = this.state.cumTime;
-        cumTime = cumTime + incrementalTime/1000;
+                cumTime = cumTime + incrementalTime/1000;
 
 //        alert("tracker got top%="+topPct+", bot%="+botPct+" inc time="+incrementalTime+", cum time="+this.state.cumTime);
        // this.setState({cumTime : cumTime, lastUpdate : ts});
             this.state.cumTime = cumTime;
             this.state.lastUpdate = ts;
+            this.state.lowestPos = Math.max(botPct, this.state.lowestPos);
+            this.state.highestPos = Math.min(topPct, this.state.highestPos);
     }
 
 
@@ -192,7 +223,7 @@ setPersister(per) {
         if (this.state.selected !== '') return;
         return (
             <div class="banner" style={{position : 'relative'}}>
-                <Slide duration="1000" transition="2000" >
+                <Slide duration="1000" transition="2000" {...sliderProperties} >
                     {slideImages.map((slideImage, index) => (
                         <div key={index}>
                           <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }}>
