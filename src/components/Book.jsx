@@ -85,7 +85,9 @@ componentDidUpdate(prevProps, prevState) {
             trackingInfo : null,
 
             };
-       // this.setState ( { selected : topic, mode : mode});
+        this.setState ( { selected : topic, mode : mode});
+        //this.state. selected = topic;
+        //this.state.mode = mode;
     }
 
     getTopic() {
@@ -125,7 +127,7 @@ componentDidUpdate(prevProps, prevState) {
                    (curval.id == key ? curval : null), null);
 
         if (!track) return "Unseen";
-        return track.bottom > 0.95 && track.cumTime > 60 ? "Finished" : "InProgress:" + track.bottom+", t="+track.cumTime;
+        return track.seenBottom > 0.95 && track.cumTime > 60 ? "Finished" : "InProgress:" + track.seenBottom+", t="+track.cumTime;
 
         }
 
@@ -372,9 +374,9 @@ componentDidUpdate(prevProps, prevState) {
                 {this.renderChapter(2, "Or did it begin here?", "images/book/chap2.jpg", "images/book/chap2end.jpg")}
                 {this.renderChapter(3, "Here. It actually began here.", "images/book/chap3.jpg", "images/book/chap3end.jpg")}
                 {this.renderChapter(4, "The Arrow", "images/book/chap4.jpg", "images/book/chap4end.jpg")}
-                {this.renderChapter(5, "The Nerd", "images/book/chap5.jpg", "images/book/chap5end.jpg")}
-                {this.renderChapter(9, "Relating")}
-                {this.renderChapter(18, "Polyamory")}
+                {/*this.renderChapter(5, "The Nerd", "images/book/chap5.jpg", "images/book/chap5end.jpg")*/}
+                {/*this.renderChapter(9, "Relating")*/}
+                {/*this.renderChapter(18, "Polyamory")*/}
             </div>
             );
 	}

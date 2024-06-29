@@ -1,39 +1,54 @@
 
-import  {Schema} from "../amplify/data/resource";
+import  {Schema} from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { Component, createElement, useState, useEffect } from 'react';
+import {   useState, useEffect } from 'react';
 
 const client = generateClient<Schema>();
 
-export function persistTrackingInfo(location, cumTime, top, bottom) {
+export function persistTrackingInfo(location, cumTime, top, lowest) {
     var msg = "persister";
+
     if (location && cumTime) {
         msg = "persist tracking info: "+location +" for "+ cumTime;
       //  alert(msg);
-        updateTracking(location, cumTime, top, bottom);
+        updateTracking(location, cumTime, top, lowest);
     }
+
     return (<p>{msg}</p>);
 }
 
-    function updateTracking(location, cumTime, top, bottom) {
+    function updateTracking(location, cumTime, top, lowest) {
+        const saveT=  (ret) => {  return ret?saveTracking(ret.data, cumTime, top, lowest) : null };
+        const createT= () => { createTracking(location, cumTime, top, lowest); return null; };
 
-    var track;
-    client.models.Tracking.get({ id: location, }).then(
-        (retval) => { saveTracking(retval.data, cumTime, top, bottom)},
-        createTracking(location, cumTime,top, bottom));
+
+    client.models.Tracking.get({ id: location }).then(
+        (ret) => saveT(ret),  createT() );
     }
 
-function saveTracking(track, cumTime, top, bottom) {
+function saveTracking(track, cumTime, top, bot ) {
     const priorTime = track.cumTime;
-    const priorTop= track.top;
-    const priorBottom = track.bottom;
+    const priorTop= track.seenTop;
+    const priorBot = track.lowest;
     const location = track.location;
-    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime, top: Math.min(top, priorTop), bottom: Math.max(bottom, priorBottom)};
+//    const foo= 1;
+    const
+       newTop= (top < priorTop) ? top:priorTop;
+
+    const
+        newLowest= priorBot> bot? priorBot:bot;
+
+//    const newTracking = { id: location, location: location, cumTime : priorTime + cumTime, top: Math.min(top, priorTop), lowest: Math.max(lowest, priorlowest)};
+    const
+        newTracking= { id:location, location: location, seenTop : newTop, seenBottom : newLowest,  cumTime : priorTime + cumTime};
     client.models.Tracking.update(newTracking);
+    return newTracking;
 }
 
-function createTracking(location, cumTime, top, bottom) {
-    client.models.Tracking.create({ id: location, location:location, cumTime : cumTime, top:top, bottom:bottom });
+function createTracking(location, cumTime, top, lowest) {
+    var t= { id: location, location:location, cumTime : cumTime, seenTop: top, seenBottom: lowest }
+    client.models.Tracking.create(t);
+    return null;
     }
 
 
@@ -47,13 +62,6 @@ export  function deleteAllTrackings(data) {
     }
 
 
-      export function isPersisted (key) {
-      /*
-        return trackings.reduce(
-            (accumulator, curval) =>  accumulator ? accumulator :
-                curval.id === key ? curval : null);
-                */
-      }
 
 export function Persister (props) {
 

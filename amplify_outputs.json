@@ -51,22 +51,22 @@
               "isRequired": false,
               "attributes": []
             },
+            "seenTop": {
+              "name": "seenTop",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "seenBottom": {
+              "name": "seenBottom",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
             "cumTime": {
               "name": "cumTime",
-              "isArray": false,
-              "type": "Float",
-              "isRequired": false,
-              "attributes": []
-            },
-            "top": {
-              "name": "top",
-              "isArray": false,
-              "type": "Float",
-              "isRequired": false,
-              "attributes": []
-            },
-            "bottom": {
-              "name": "bottom",
               "isArray": false,
               "type": "Float",
               "isRequired": false,
@@ -95,6 +95,14 @@
             {
               "type": "model",
               "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "id"
+                ]
+              }
             },
             {
               "type": "auth",
