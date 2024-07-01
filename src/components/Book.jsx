@@ -172,7 +172,7 @@ componentDidUpdate(prevProps, prevState) {
         var nextChap = "Chapter" +(num + 1);
         var curChap =  num > 0 ? "Chapter"+num : "AuthorsNote";
         var prevChap = num > 1 ? "Chapter"+(num-1)  : num === 1 ? "AuthorsNote" : "";
-        var link = prefix + nextChap;
+        var link = num < 4 ? prefix + nextChap : "";
         var prevLink = prevChap === "" ? null : prefix + prevChap;
 
         var status = this.trackStatus("/book" + prefix+curChap);
@@ -251,8 +251,6 @@ componentDidUpdate(prevProps, prevState) {
 	    <td ><input class="input" style={{ width:"200px" }} name="invite_code" value={this.state.inviteHash} onChange={this.updateInviteHash}/></td>
 	    </tr>
 	    </table>
-	    <p>Invite ok: {"" + okInvite}</p>
-	    <p>Invitation code is {dispCode}</p>
 	    </>);
 	}
 
